@@ -1,0 +1,27 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Best Practices
+
+## Component Guidelines
+- Keep components focused and single-responsibility
+- Use TypeScript for better type safety and developer experience
+- Implement responsive design using Tailwind's mobile-first approach
+- Use semantic HTML elements for better accessibility
+
+## Styling Guidelines
+- Use Tailwind's utility classes for styling
+- Follow consistent spacing using Tailwind's spacing scale
+- For responsive designs:
+  1. Start with mobile layout
+  2. Add `sm:`, `md:`, `lg:` breakpoints as needed
+  3. Use consistent width progressions (e.g., w-[90px] → w-[120px] → w-[150px])
+  4. Add transitions for smooth responsive changes
+
+## Performance
+- Use Next.js Image component for optimized images
+- Implement proper loading states
+- Keep bundle size minimal by avoiding unnecessary imports
+- Use server components where possible to reduce client-side JavaScript

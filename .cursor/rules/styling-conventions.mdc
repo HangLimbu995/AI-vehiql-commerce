@@ -1,0 +1,26 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Styling Conventions
+
+## Tailwind CSS Usage
+- The project uses Tailwind CSS with custom theme configuration
+- Global styles are defined in [app/globals.css](mdc:app/globals.css)
+- Custom theme variables use OKLCH color space for better color reproduction
+- Responsive design uses standard Tailwind breakpoints:
+  - `sm`: 640px and up
+  - `md`: 768px and up
+  - `lg`: 1024px and up
+  - `xl`: 1280px and up
+
+## Custom Utilities
+- `.gradient-title` - Creates a gradient text effect with blue to green colors
+- `.dotted-background` - Creates a dotted background pattern
+- Use transition utilities like `transition-all duration-300` for smooth animations
+
+## Dark Mode
+- Dark mode is supported using the `.dark` class variant
+- Custom color variables are defined for both light and dark modes
+- Use the theme variables (e.g., `bg-background`, `text-foreground`) for consistent theming

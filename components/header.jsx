@@ -4,9 +4,12 @@ import React from "react";
 import { Button } from "./ui/button";
 import { ArrowLeft, CarFront, Heart, Layout } from "lucide-react";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { checkUser } from "@/lib/checkUser";
 
 const Header = async ({ isAdminPage = false }) => {
-  const isAdmin = false;
+  const user = await checkUser();
+  
+  const isAdmin = user?.role === 'ADMIN';
 
   return (
     <header className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b">
@@ -69,9 +72,9 @@ const Header = async ({ isAdminPage = false }) => {
           )}
 
           <SignedOut>
-            <SignInButton forceRedirectUrl="/">
-              <Button variant={"outline"}>Login</Button>
-            </SignInButton>
+            <Link href="/sign-in">
+              <Button variant="outline">Login</Button>
+            </Link>
           </SignedOut>
 
           <SignedIn>

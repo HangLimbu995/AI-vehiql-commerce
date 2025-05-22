@@ -1,0 +1,24 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Project Structure Guide
+
+This is a Next.js e-commerce application using modern tools and practices. Here's the key directory structure:
+
+## Core Directories
+- [app/](mdc:app) - Contains the Next.js application routes and pages
+- [components/](mdc:components) - Reusable React components
+- [actions/](mdc:actions) - Server actions and API endpoints
+- [lib/](mdc:lib) - Utility functions and shared libraries
+- [prisma/](mdc:prisma) - Database schema and migrations
+- [public/](mdc:public) - Static assets
+
+## Key Configuration Files
+- [package.json](mdc:package.json) - Project dependencies and scripts
+- [next.config.mjs](mdc:next.config.mjs) - Next.js configuration
+- [components.json](mdc:components.json) - UI components configuration
+- [middleware.js](mdc:middleware.js) - Next.js middleware for authentication and routing
+- [app/globals.css](mdc:app/globals.css) - Global styles and Tailwind configuration
+
