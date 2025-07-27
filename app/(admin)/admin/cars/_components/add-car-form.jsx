@@ -81,7 +81,7 @@ const AddCarForm = () => {
     watch,
   } = useForm({
     resolver: zodResolver(carFormSchema),
-    default: {
+    defaultValues: {
       make: "",
       model: "",
       year: "",
@@ -100,9 +100,12 @@ const AddCarForm = () => {
 
   const onAiDrop = (acceptedFiles) => {
     const file = acceptedFiles[0];
-    if (file && file.size > 5 * 1024 * 1024) {
-      toast.error("Image size must be less then 5MB");
-      return;
+
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image size must be less than 5MB");
+        return;
+      }
     }
 
     setUploadedAiImage(file);
@@ -110,12 +113,14 @@ const AddCarForm = () => {
     const reader = new FileReader();
 
     reader.onloadend = (e) => {
+      console.log("error 1");
       setImagePreview(e.target.result);
       toast.success("Image uploaded successfully");
     };
 
     reader.readAsDataURL(file);
   };
+  
   const {
     getRootProps: getAiRootProps,
     getInputProps: getAiInputProps,
@@ -153,6 +158,7 @@ const AddCarForm = () => {
   useEffect(() => {
     if (processImageResult?.success) {
       const carDetails = processImageResult.data;
+
 
       // Update form with AI results
       setValue("make", carDetails.make);
@@ -396,7 +402,7 @@ const AddCarForm = () => {
                     <Label htmlFor="transmission">Transmission</Label>
                     <Select
                       onValueChange={(value) => setValue("transmission", value)}
-                      default={getValues("transmission")}
+                      defaultValue={getValues("transmission")}
                     >
                       <SelectTrigger
                         className={errors.transmission ? "border-red-500" : ""}
@@ -421,7 +427,7 @@ const AddCarForm = () => {
                     <Label htmlFor="bodyType">Body Type</Label>
                     <Select
                       onValueChange={(value) => setValue("bodyType", value)}
-                      defaultValue={getValues("bodyTypes")}
+                      defaultValue={getValues("bodyType")}
                     >
                       <SelectTrigger
                         className={errors.bodyType ? "border-red-500" : ""}
@@ -459,10 +465,10 @@ const AddCarForm = () => {
                     <Label htmlFor="status">Status</Label>
                     <Select
                       onValueChange={(value) => setValue("status", value)}
-                      defaultValue={getValues("status")}
+                      defaultValue={watch("status")}
                     >
                       <SelectTrigger
-                        className={errors.status ? "text-red-500" : ""}
+                        className={errors.status ? "border-red-500" : ""}
                       >
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
@@ -604,7 +610,7 @@ const AddCarForm = () => {
                         alt="Car preview"
                         className="max-h-56 max-w-full object-contain mb-4"
                       />
-                      <div className="flex gap-2 ">
+                      <div className="flex gap-2  justify-center ">
                         <Button
                           variant="outline"
                           size="sm"
