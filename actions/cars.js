@@ -262,7 +262,7 @@ export async function getCars(search = "") {
 export async function deleteCar(id) {
   try {
     const { userId } = await auth();
-    if (userId) throw new Error("Unauthorized");
+    if (!userId) throw new Error("Unauthorized");
 
     // First fetch the car to get its images
     const car = await db.car.findUnique({
