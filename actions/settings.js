@@ -1,6 +1,7 @@
 "use server";
 
 import { dayOfWeek } from "@/lib/generated/prisma";
+import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 
@@ -10,7 +11,7 @@ export async function getDealershipInfo() {
     if (!userId) throw new Error("Unauthorized");
 
     // Get the dealership record
-    let dealership = await db.getDealershipInfo.findFirst({
+    let dealership = await db.dealershipInfo.findFirst({
       include: {
         workingHours: {
           orderBy: { dayOfWeek: "asc" },
@@ -20,7 +21,7 @@ export async function getDealershipInfo() {
 
     // If no dealership exists, create a default one
     if (!dealership) {
-      dealership = await db.getDealershipInfo.create({
+      dealership = await db.dealershipInfo.create({
         data: {
           // Defalt values will be used from schema
           workingHours: {
@@ -69,10 +70,10 @@ export async function getDealershipInfo() {
               },
             ],
           },
-          include: {
-            workingHours: {
-              orderBy: { dayOfWeek: "asc" },
-            },
+        },
+        include: {
+          workingHours: {
+            orderBy: { dayOfWeek: "asc" },
           },
         },
       });
@@ -154,5 +155,54 @@ export async function getUsers() {
     if (!adminUser || adminUser.role !== "ADMIN") {
       throw new Error("Unauthorized: Admin access required");
     }
-  } catch (error) {}
+
+    // Get all users
+    const users = await db.user.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+
+    console.log('user is ',users)
+    
+    return {
+      success: true,
+      data: users.map((user) => ({
+        ...user,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
+      })),
+    };
+  } catch (error) {
+    throw new Error("Error fetching users:" + error.message);
+  }
+}
+
+// Update user role
+export async function updateUserRole(userId, role) {
+  try {
+    const { userId: adminId } = await auth();
+    if (!adminId) throw new Error("Unauthorized");
+
+    const adminUser = await db.user.findUnique({
+      where: { clerkUserId: adminId },
+    });
+
+    if (!adminUser || adminUser.role !== "ADMIN") {
+      throw new Error("Unauthorized: Admin access required");
+    }
+
+    // Update user role
+    await db.user.update({
+      where: { id: userId },
+      data: { role },
+    });
+
+    // Revalidate path
+    revalidatePath("/admin/settings");
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    throw new Error("Error updating user role:" + error.message);
+  }
 }

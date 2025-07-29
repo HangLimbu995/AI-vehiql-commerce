@@ -23,7 +23,7 @@ model User {
   imageUrl    String?
   phone       String?
   createdAt   DateTime           @default(now())
-  upatedAt    DateTime           @updatedAt
+  updatedAt   DateTime           @updatedAt
   role        UserRole           @default(USER)
   savedCars   UserSavedCar[]
   testDrives  TestDriveBooking[]
@@ -86,7 +86,8 @@ model WorkingHour {
   dealership   DealershipInfo @relation(fields: [dealershipId], references: [id], onDelete: Cascade)
   dayOfWeek    dayOfWeek
   openTime     String // Format: "HH:MM" (24-hour)
-  isOpen       String // Fomrat: "HH:MM" (24-hour)
+  closeTime    String // Fomrat: "HH:MM" (24-hour)
+  isOpen       Boolean        @default(true)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 
@@ -98,7 +99,7 @@ model WorkingHour {
 
 enum dayOfWeek {
   MONDAY
-  TUDESDAY
+  TUESDAY
   WEDNESDAY
   THURSDAY
   FRIDAY

@@ -122,7 +122,7 @@ export const BookingStatus: typeof $Enums.BookingStatus
  */
 export class PrismaClient<
   ClientOptions extends Prisma.PrismaClientOptions = Prisma.PrismaClientOptions,
-  U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
+  const U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
   ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs
 > {
   [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['other'] }
@@ -348,8 +348,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.6.0
-   * Query Engine version: f676762280b54cd07c770017ed3711ddde35f37a
+   * Prisma Client JS version: 6.13.0
+   * Query Engine version: 361e86d0ea4987e9f53a565309b3eed797a6bcbd
    */
   export type PrismaVersion = {
     client: string
@@ -1245,16 +1245,24 @@ export namespace Prisma {
     /**
      * @example
      * ```
-     * // Defaults to stdout
+     * // Shorthand for `emit: 'stdout'`
      * log: ['query', 'info', 'warn', 'error']
      * 
-     * // Emit as events
+     * // Emit as events only
      * log: [
-     *   { emit: 'stdout', level: 'query' },
-     *   { emit: 'stdout', level: 'info' },
-     *   { emit: 'stdout', level: 'warn' }
-     *   { emit: 'stdout', level: 'error' }
+     *   { emit: 'event', level: 'query' },
+     *   { emit: 'event', level: 'info' },
+     *   { emit: 'event', level: 'warn' }
+     *   { emit: 'event', level: 'error' }
      * ]
+     * 
+     * / Emit as events and log to stdout
+     * og: [
+     *  { emit: 'stdout', level: 'query' },
+     *  { emit: 'stdout', level: 'info' },
+     *  { emit: 'stdout', level: 'warn' }
+     *  { emit: 'stdout', level: 'error' }
+     * 
      * ```
      * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
      */
@@ -1301,10 +1309,15 @@ export namespace Prisma {
     emit: 'stdout' | 'event'
   }
 
-  export type GetLogType<T extends LogLevel | LogDefinition> = T extends LogDefinition ? T['emit'] extends 'event' ? T['level'] : never : never
-  export type GetEvents<T extends any> = T extends Array<LogLevel | LogDefinition> ?
-    GetLogType<T[0]> | GetLogType<T[1]> | GetLogType<T[2]> | GetLogType<T[3]>
-    : never
+  export type CheckIsLogLevel<T> = T extends LogLevel ? T : never;
+
+  export type GetLogType<T> = CheckIsLogLevel<
+    T extends LogDefinition ? T['level'] : T
+  >;
+
+  export type GetEvents<T extends any[]> = T extends Array<LogLevel | LogDefinition>
+    ? GetLogType<T[number]>
+    : never;
 
   export type QueryEvent = {
     timestamp: Date
@@ -1514,7 +1527,7 @@ export namespace Prisma {
     imageUrl: string | null
     phone: string | null
     createdAt: Date | null
-    upatedAt: Date | null
+    updatedAt: Date | null
     role: $Enums.UserRole | null
   }
 
@@ -1526,7 +1539,7 @@ export namespace Prisma {
     imageUrl: string | null
     phone: string | null
     createdAt: Date | null
-    upatedAt: Date | null
+    updatedAt: Date | null
     role: $Enums.UserRole | null
   }
 
@@ -1538,7 +1551,7 @@ export namespace Prisma {
     imageUrl: number
     phone: number
     createdAt: number
-    upatedAt: number
+    updatedAt: number
     role: number
     _all: number
   }
@@ -1552,7 +1565,7 @@ export namespace Prisma {
     imageUrl?: true
     phone?: true
     createdAt?: true
-    upatedAt?: true
+    updatedAt?: true
     role?: true
   }
 
@@ -1564,7 +1577,7 @@ export namespace Prisma {
     imageUrl?: true
     phone?: true
     createdAt?: true
-    upatedAt?: true
+    updatedAt?: true
     role?: true
   }
 
@@ -1576,7 +1589,7 @@ export namespace Prisma {
     imageUrl?: true
     phone?: true
     createdAt?: true
-    upatedAt?: true
+    updatedAt?: true
     role?: true
     _all?: true
   }
@@ -1661,7 +1674,7 @@ export namespace Prisma {
     imageUrl: string | null
     phone: string | null
     createdAt: Date
-    upatedAt: Date
+    updatedAt: Date
     role: $Enums.UserRole
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
@@ -1690,7 +1703,7 @@ export namespace Prisma {
     imageUrl?: boolean
     phone?: boolean
     createdAt?: boolean
-    upatedAt?: boolean
+    updatedAt?: boolean
     role?: boolean
     savedCars?: boolean | User$savedCarsArgs<ExtArgs>
     testDrives?: boolean | User$testDrivesArgs<ExtArgs>
@@ -1705,7 +1718,7 @@ export namespace Prisma {
     imageUrl?: boolean
     phone?: boolean
     createdAt?: boolean
-    upatedAt?: boolean
+    updatedAt?: boolean
     role?: boolean
   }, ExtArgs["result"]["user"]>
 
@@ -1717,7 +1730,7 @@ export namespace Prisma {
     imageUrl?: boolean
     phone?: boolean
     createdAt?: boolean
-    upatedAt?: boolean
+    updatedAt?: boolean
     role?: boolean
   }, ExtArgs["result"]["user"]>
 
@@ -1729,11 +1742,11 @@ export namespace Prisma {
     imageUrl?: boolean
     phone?: boolean
     createdAt?: boolean
-    upatedAt?: boolean
+    updatedAt?: boolean
     role?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clerkUserId" | "email" | "name" | "imageUrl" | "phone" | "createdAt" | "upatedAt" | "role", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clerkUserId" | "email" | "name" | "imageUrl" | "phone" | "createdAt" | "updatedAt" | "role", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     savedCars?: boolean | User$savedCarsArgs<ExtArgs>
     testDrives?: boolean | User$testDrivesArgs<ExtArgs>
@@ -1756,7 +1769,7 @@ export namespace Prisma {
       imageUrl: string | null
       phone: string | null
       createdAt: Date
-      upatedAt: Date
+      updatedAt: Date
       role: $Enums.UserRole
     }, ExtArgs["result"]["user"]>
     composites: {}
@@ -2190,7 +2203,7 @@ export namespace Prisma {
     readonly imageUrl: FieldRef<"User", 'String'>
     readonly phone: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
-    readonly upatedAt: FieldRef<"User", 'DateTime'>
+    readonly updatedAt: FieldRef<"User", 'DateTime'>
     readonly role: FieldRef<"User", 'UserRole'>
   }
     
@@ -8341,7 +8354,7 @@ export namespace Prisma {
     imageUrl: 'imageUrl',
     phone: 'phone',
     createdAt: 'createdAt',
-    upatedAt: 'upatedAt',
+    updatedAt: 'updatedAt',
     role: 'role'
   };
 
@@ -8600,7 +8613,7 @@ export namespace Prisma {
     imageUrl?: StringNullableFilter<"User"> | string | null
     phone?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
-    upatedAt?: DateTimeFilter<"User"> | Date | string
+    updatedAt?: DateTimeFilter<"User"> | Date | string
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     savedCars?: UserSavedCarListRelationFilter
     testDrives?: TestDriveBookingListRelationFilter
@@ -8614,7 +8627,7 @@ export namespace Prisma {
     imageUrl?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
     createdAt?: SortOrder
-    upatedAt?: SortOrder
+    updatedAt?: SortOrder
     role?: SortOrder
     savedCars?: UserSavedCarOrderByRelationAggregateInput
     testDrives?: TestDriveBookingOrderByRelationAggregateInput
@@ -8631,7 +8644,7 @@ export namespace Prisma {
     imageUrl?: StringNullableFilter<"User"> | string | null
     phone?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
-    upatedAt?: DateTimeFilter<"User"> | Date | string
+    updatedAt?: DateTimeFilter<"User"> | Date | string
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     savedCars?: UserSavedCarListRelationFilter
     testDrives?: TestDriveBookingListRelationFilter
@@ -8645,7 +8658,7 @@ export namespace Prisma {
     imageUrl?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
     createdAt?: SortOrder
-    upatedAt?: SortOrder
+    updatedAt?: SortOrder
     role?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
@@ -8663,7 +8676,7 @@ export namespace Prisma {
     imageUrl?: StringNullableWithAggregatesFilter<"User"> | string | null
     phone?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
-    upatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     role?: EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
   }
 
@@ -9068,7 +9081,7 @@ export namespace Prisma {
     imageUrl?: string | null
     phone?: string | null
     createdAt?: Date | string
-    upatedAt?: Date | string
+    updatedAt?: Date | string
     role?: $Enums.UserRole
     savedCars?: UserSavedCarCreateNestedManyWithoutUserInput
     testDrives?: TestDriveBookingCreateNestedManyWithoutUserInput
@@ -9082,7 +9095,7 @@ export namespace Prisma {
     imageUrl?: string | null
     phone?: string | null
     createdAt?: Date | string
-    upatedAt?: Date | string
+    updatedAt?: Date | string
     role?: $Enums.UserRole
     savedCars?: UserSavedCarUncheckedCreateNestedManyWithoutUserInput
     testDrives?: TestDriveBookingUncheckedCreateNestedManyWithoutUserInput
@@ -9096,7 +9109,7 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    upatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     savedCars?: UserSavedCarUpdateManyWithoutUserNestedInput
     testDrives?: TestDriveBookingUpdateManyWithoutUserNestedInput
@@ -9110,7 +9123,7 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    upatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     savedCars?: UserSavedCarUncheckedUpdateManyWithoutUserNestedInput
     testDrives?: TestDriveBookingUncheckedUpdateManyWithoutUserNestedInput
@@ -9124,7 +9137,7 @@ export namespace Prisma {
     imageUrl?: string | null
     phone?: string | null
     createdAt?: Date | string
-    upatedAt?: Date | string
+    updatedAt?: Date | string
     role?: $Enums.UserRole
   }
 
@@ -9136,7 +9149,7 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    upatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   }
 
@@ -9148,7 +9161,7 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    upatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   }
 
@@ -9667,7 +9680,7 @@ export namespace Prisma {
     imageUrl?: SortOrder
     phone?: SortOrder
     createdAt?: SortOrder
-    upatedAt?: SortOrder
+    updatedAt?: SortOrder
     role?: SortOrder
   }
 
@@ -9679,7 +9692,7 @@ export namespace Prisma {
     imageUrl?: SortOrder
     phone?: SortOrder
     createdAt?: SortOrder
-    upatedAt?: SortOrder
+    updatedAt?: SortOrder
     role?: SortOrder
   }
 
@@ -9691,7 +9704,7 @@ export namespace Prisma {
     imageUrl?: SortOrder
     phone?: SortOrder
     createdAt?: SortOrder
-    upatedAt?: SortOrder
+    updatedAt?: SortOrder
     role?: SortOrder
   }
 
@@ -11080,7 +11093,7 @@ export namespace Prisma {
     imageUrl?: string | null
     phone?: string | null
     createdAt?: Date | string
-    upatedAt?: Date | string
+    updatedAt?: Date | string
     role?: $Enums.UserRole
     testDrives?: TestDriveBookingCreateNestedManyWithoutUserInput
   }
@@ -11093,7 +11106,7 @@ export namespace Prisma {
     imageUrl?: string | null
     phone?: string | null
     createdAt?: Date | string
-    upatedAt?: Date | string
+    updatedAt?: Date | string
     role?: $Enums.UserRole
     testDrives?: TestDriveBookingUncheckedCreateNestedManyWithoutUserInput
   }
@@ -11169,7 +11182,7 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    upatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     testDrives?: TestDriveBookingUpdateManyWithoutUserNestedInput
   }
@@ -11182,7 +11195,7 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    upatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     testDrives?: TestDriveBookingUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -11295,7 +11308,7 @@ export namespace Prisma {
     imageUrl?: string | null
     phone?: string | null
     createdAt?: Date | string
-    upatedAt?: Date | string
+    updatedAt?: Date | string
     role?: $Enums.UserRole
     savedCars?: UserSavedCarCreateNestedManyWithoutUserInput
   }
@@ -11308,7 +11321,7 @@ export namespace Prisma {
     imageUrl?: string | null
     phone?: string | null
     createdAt?: Date | string
-    upatedAt?: Date | string
+    updatedAt?: Date | string
     role?: $Enums.UserRole
     savedCars?: UserSavedCarUncheckedCreateNestedManyWithoutUserInput
   }
@@ -11390,7 +11403,7 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    upatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     savedCars?: UserSavedCarUpdateManyWithoutUserNestedInput
   }
@@ -11403,7 +11416,7 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    upatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     savedCars?: UserSavedCarUncheckedUpdateManyWithoutUserNestedInput
   }
