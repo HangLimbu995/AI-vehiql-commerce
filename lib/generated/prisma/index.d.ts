@@ -67,7 +67,7 @@ export type CarStatus = (typeof CarStatus)[keyof typeof CarStatus]
 
 export const dayOfWeek: {
   MONDAY: 'MONDAY',
-  TUDESDAY: 'TUDESDAY',
+  TUESDAY: 'TUESDAY',
   WEDNESDAY: 'WEDNESDAY',
   THURSDAY: 'THURSDAY',
   FRIDAY: 'FRIDAY',
@@ -5053,7 +5053,8 @@ export namespace Prisma {
     dealershipId: string | null
     dayOfWeek: $Enums.dayOfWeek | null
     openTime: string | null
-    isOpen: string | null
+    closeTime: string | null
+    isOpen: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -5063,7 +5064,8 @@ export namespace Prisma {
     dealershipId: string | null
     dayOfWeek: $Enums.dayOfWeek | null
     openTime: string | null
-    isOpen: string | null
+    closeTime: string | null
+    isOpen: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -5073,6 +5075,7 @@ export namespace Prisma {
     dealershipId: number
     dayOfWeek: number
     openTime: number
+    closeTime: number
     isOpen: number
     createdAt: number
     updatedAt: number
@@ -5085,6 +5088,7 @@ export namespace Prisma {
     dealershipId?: true
     dayOfWeek?: true
     openTime?: true
+    closeTime?: true
     isOpen?: true
     createdAt?: true
     updatedAt?: true
@@ -5095,6 +5099,7 @@ export namespace Prisma {
     dealershipId?: true
     dayOfWeek?: true
     openTime?: true
+    closeTime?: true
     isOpen?: true
     createdAt?: true
     updatedAt?: true
@@ -5105,6 +5110,7 @@ export namespace Prisma {
     dealershipId?: true
     dayOfWeek?: true
     openTime?: true
+    closeTime?: true
     isOpen?: true
     createdAt?: true
     updatedAt?: true
@@ -5188,7 +5194,8 @@ export namespace Prisma {
     dealershipId: string
     dayOfWeek: $Enums.dayOfWeek
     openTime: string
-    isOpen: string
+    closeTime: string
+    isOpen: boolean
     createdAt: Date
     updatedAt: Date
     _count: WorkingHourCountAggregateOutputType | null
@@ -5215,6 +5222,7 @@ export namespace Prisma {
     dealershipId?: boolean
     dayOfWeek?: boolean
     openTime?: boolean
+    closeTime?: boolean
     isOpen?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -5226,6 +5234,7 @@ export namespace Prisma {
     dealershipId?: boolean
     dayOfWeek?: boolean
     openTime?: boolean
+    closeTime?: boolean
     isOpen?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -5237,6 +5246,7 @@ export namespace Prisma {
     dealershipId?: boolean
     dayOfWeek?: boolean
     openTime?: boolean
+    closeTime?: boolean
     isOpen?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -5248,12 +5258,13 @@ export namespace Prisma {
     dealershipId?: boolean
     dayOfWeek?: boolean
     openTime?: boolean
+    closeTime?: boolean
     isOpen?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type WorkingHourOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "dealershipId" | "dayOfWeek" | "openTime" | "isOpen" | "createdAt" | "updatedAt", ExtArgs["result"]["workingHour"]>
+  export type WorkingHourOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "dealershipId" | "dayOfWeek" | "openTime" | "closeTime" | "isOpen" | "createdAt" | "updatedAt", ExtArgs["result"]["workingHour"]>
   export type WorkingHourInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     dealership?: boolean | DealershipInfoDefaultArgs<ExtArgs>
   }
@@ -5274,7 +5285,8 @@ export namespace Prisma {
       dealershipId: string
       dayOfWeek: $Enums.dayOfWeek
       openTime: string
-      isOpen: string
+      closeTime: string
+      isOpen: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["workingHour"]>
@@ -5705,7 +5717,8 @@ export namespace Prisma {
     readonly dealershipId: FieldRef<"WorkingHour", 'String'>
     readonly dayOfWeek: FieldRef<"WorkingHour", 'dayOfWeek'>
     readonly openTime: FieldRef<"WorkingHour", 'String'>
-    readonly isOpen: FieldRef<"WorkingHour", 'String'>
+    readonly closeTime: FieldRef<"WorkingHour", 'String'>
+    readonly isOpen: FieldRef<"WorkingHour", 'Boolean'>
     readonly createdAt: FieldRef<"WorkingHour", 'DateTime'>
     readonly updatedAt: FieldRef<"WorkingHour", 'DateTime'>
   }
@@ -8376,6 +8389,7 @@ export namespace Prisma {
     dealershipId: 'dealershipId',
     dayOfWeek: 'dayOfWeek',
     openTime: 'openTime',
+    closeTime: 'closeTime',
     isOpen: 'isOpen',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -8846,7 +8860,8 @@ export namespace Prisma {
     dealershipId?: StringFilter<"WorkingHour"> | string
     dayOfWeek?: EnumdayOfWeekFilter<"WorkingHour"> | $Enums.dayOfWeek
     openTime?: StringFilter<"WorkingHour"> | string
-    isOpen?: StringFilter<"WorkingHour"> | string
+    closeTime?: StringFilter<"WorkingHour"> | string
+    isOpen?: BoolFilter<"WorkingHour"> | boolean
     createdAt?: DateTimeFilter<"WorkingHour"> | Date | string
     updatedAt?: DateTimeFilter<"WorkingHour"> | Date | string
     dealership?: XOR<DealershipInfoScalarRelationFilter, DealershipInfoWhereInput>
@@ -8857,6 +8872,7 @@ export namespace Prisma {
     dealershipId?: SortOrder
     dayOfWeek?: SortOrder
     openTime?: SortOrder
+    closeTime?: SortOrder
     isOpen?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -8872,7 +8888,8 @@ export namespace Prisma {
     dealershipId?: StringFilter<"WorkingHour"> | string
     dayOfWeek?: EnumdayOfWeekFilter<"WorkingHour"> | $Enums.dayOfWeek
     openTime?: StringFilter<"WorkingHour"> | string
-    isOpen?: StringFilter<"WorkingHour"> | string
+    closeTime?: StringFilter<"WorkingHour"> | string
+    isOpen?: BoolFilter<"WorkingHour"> | boolean
     createdAt?: DateTimeFilter<"WorkingHour"> | Date | string
     updatedAt?: DateTimeFilter<"WorkingHour"> | Date | string
     dealership?: XOR<DealershipInfoScalarRelationFilter, DealershipInfoWhereInput>
@@ -8883,6 +8900,7 @@ export namespace Prisma {
     dealershipId?: SortOrder
     dayOfWeek?: SortOrder
     openTime?: SortOrder
+    closeTime?: SortOrder
     isOpen?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -8899,7 +8917,8 @@ export namespace Prisma {
     dealershipId?: StringWithAggregatesFilter<"WorkingHour"> | string
     dayOfWeek?: EnumdayOfWeekWithAggregatesFilter<"WorkingHour"> | $Enums.dayOfWeek
     openTime?: StringWithAggregatesFilter<"WorkingHour"> | string
-    isOpen?: StringWithAggregatesFilter<"WorkingHour"> | string
+    closeTime?: StringWithAggregatesFilter<"WorkingHour"> | string
+    isOpen?: BoolWithAggregatesFilter<"WorkingHour"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"WorkingHour"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"WorkingHour"> | Date | string
   }
@@ -9359,7 +9378,8 @@ export namespace Prisma {
     id?: string
     dayOfWeek: $Enums.dayOfWeek
     openTime: string
-    isOpen: string
+    closeTime: string
+    isOpen?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     dealership: DealershipInfoCreateNestedOneWithoutWorkingHoursInput
@@ -9370,7 +9390,8 @@ export namespace Prisma {
     dealershipId: string
     dayOfWeek: $Enums.dayOfWeek
     openTime: string
-    isOpen: string
+    closeTime: string
+    isOpen?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9379,7 +9400,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     dayOfWeek?: EnumdayOfWeekFieldUpdateOperationsInput | $Enums.dayOfWeek
     openTime?: StringFieldUpdateOperationsInput | string
-    isOpen?: StringFieldUpdateOperationsInput | string
+    closeTime?: StringFieldUpdateOperationsInput | string
+    isOpen?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     dealership?: DealershipInfoUpdateOneRequiredWithoutWorkingHoursNestedInput
@@ -9390,7 +9412,8 @@ export namespace Prisma {
     dealershipId?: StringFieldUpdateOperationsInput | string
     dayOfWeek?: EnumdayOfWeekFieldUpdateOperationsInput | $Enums.dayOfWeek
     openTime?: StringFieldUpdateOperationsInput | string
-    isOpen?: StringFieldUpdateOperationsInput | string
+    closeTime?: StringFieldUpdateOperationsInput | string
+    isOpen?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9400,7 +9423,8 @@ export namespace Prisma {
     dealershipId: string
     dayOfWeek: $Enums.dayOfWeek
     openTime: string
-    isOpen: string
+    closeTime: string
+    isOpen?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9409,7 +9433,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     dayOfWeek?: EnumdayOfWeekFieldUpdateOperationsInput | $Enums.dayOfWeek
     openTime?: StringFieldUpdateOperationsInput | string
-    isOpen?: StringFieldUpdateOperationsInput | string
+    closeTime?: StringFieldUpdateOperationsInput | string
+    isOpen?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9419,7 +9444,8 @@ export namespace Prisma {
     dealershipId?: StringFieldUpdateOperationsInput | string
     dayOfWeek?: EnumdayOfWeekFieldUpdateOperationsInput | $Enums.dayOfWeek
     openTime?: StringFieldUpdateOperationsInput | string
-    isOpen?: StringFieldUpdateOperationsInput | string
+    closeTime?: StringFieldUpdateOperationsInput | string
+    isOpen?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9982,6 +10008,7 @@ export namespace Prisma {
     dealershipId?: SortOrder
     dayOfWeek?: SortOrder
     openTime?: SortOrder
+    closeTime?: SortOrder
     isOpen?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -9992,6 +10019,7 @@ export namespace Prisma {
     dealershipId?: SortOrder
     dayOfWeek?: SortOrder
     openTime?: SortOrder
+    closeTime?: SortOrder
     isOpen?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -10002,6 +10030,7 @@ export namespace Prisma {
     dealershipId?: SortOrder
     dayOfWeek?: SortOrder
     openTime?: SortOrder
+    closeTime?: SortOrder
     isOpen?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -10931,7 +10960,8 @@ export namespace Prisma {
     id?: string
     dayOfWeek: $Enums.dayOfWeek
     openTime: string
-    isOpen: string
+    closeTime: string
+    isOpen?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -10940,7 +10970,8 @@ export namespace Prisma {
     id?: string
     dayOfWeek: $Enums.dayOfWeek
     openTime: string
-    isOpen: string
+    closeTime: string
+    isOpen?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -10979,7 +11010,8 @@ export namespace Prisma {
     dealershipId?: StringFilter<"WorkingHour"> | string
     dayOfWeek?: EnumdayOfWeekFilter<"WorkingHour"> | $Enums.dayOfWeek
     openTime?: StringFilter<"WorkingHour"> | string
-    isOpen?: StringFilter<"WorkingHour"> | string
+    closeTime?: StringFilter<"WorkingHour"> | string
+    isOpen?: BoolFilter<"WorkingHour"> | boolean
     createdAt?: DateTimeFilter<"WorkingHour"> | Date | string
     updatedAt?: DateTimeFilter<"WorkingHour"> | Date | string
   }
@@ -11524,7 +11556,8 @@ export namespace Prisma {
     id?: string
     dayOfWeek: $Enums.dayOfWeek
     openTime: string
-    isOpen: string
+    closeTime: string
+    isOpen?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -11533,7 +11566,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     dayOfWeek?: EnumdayOfWeekFieldUpdateOperationsInput | $Enums.dayOfWeek
     openTime?: StringFieldUpdateOperationsInput | string
-    isOpen?: StringFieldUpdateOperationsInput | string
+    closeTime?: StringFieldUpdateOperationsInput | string
+    isOpen?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -11542,7 +11576,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     dayOfWeek?: EnumdayOfWeekFieldUpdateOperationsInput | $Enums.dayOfWeek
     openTime?: StringFieldUpdateOperationsInput | string
-    isOpen?: StringFieldUpdateOperationsInput | string
+    closeTime?: StringFieldUpdateOperationsInput | string
+    isOpen?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -11551,7 +11586,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     dayOfWeek?: EnumdayOfWeekFieldUpdateOperationsInput | $Enums.dayOfWeek
     openTime?: StringFieldUpdateOperationsInput | string
-    isOpen?: StringFieldUpdateOperationsInput | string
+    closeTime?: StringFieldUpdateOperationsInput | string
+    isOpen?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

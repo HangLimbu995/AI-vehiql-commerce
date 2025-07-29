@@ -2,6 +2,7 @@
 
 import { dayOfWeek } from "@/lib/generated/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 
 export async function getDealershipInfo() {
   try {
@@ -75,6 +76,83 @@ export async function getDealershipInfo() {
           },
         },
       });
+    }
+
+    // Format the data
+    return {
+      success: true,
+      data: {
+        ...dealership,
+        createdAt: dealership.createdAt.toISOString(),
+        updatedAt: dealership.updatedAt.toISOString(),
+      },
+    };
+  } catch (error) {
+    throw new Error("Error fetching dealership info:" + error.message);
+  }
+}
+
+export async function saveWorkingHours(workingHours) {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!user || user.role !== "ADMIN") {
+      throw new Error("Unauthorized: Admin access required");
+    }
+
+    const dealership = db.dealershipInfo.findFirst();
+
+    if (!dealership) throw new Error("Dealership data not found");
+
+    // Update working horus - first delete existing hours
+
+    await db.workingHour.deleteMany({
+      where: { dealershipId: dealership.id },
+    });
+
+    // Then create new hours
+    for (let hour of workingHours) {
+      await db.workingHour.create({
+        data: {
+          dayOfWeek: hour.dayOfWeek,
+          openTime: hour.openTime,
+          closeTime: hour.openTime,
+          isOpen: hour.isOpen,
+          dealershipId: dealership.id,
+        },
+      });
+    }
+
+    // revalidate paths
+    revalidatePath("/admin/settings");
+    revalidatePath("/"); // HomePage might display hours
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    throw new Error("Error saving working horus:" + error.message);
+  }
+}
+
+// Get all users
+export async function getUsers() {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    // Check if user is admin
+    const adminUser = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!adminUser || adminUser.role !== "ADMIN") {
+      throw new Error("Unauthorized: Admin access required");
     }
   } catch (error) {}
 }
