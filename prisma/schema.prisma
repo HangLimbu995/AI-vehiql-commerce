@@ -84,7 +84,7 @@ model WorkingHour {
   id           String         @id @default(uuid())
   dealershipId String
   dealership   DealershipInfo @relation(fields: [dealershipId], references: [id], onDelete: Cascade)
-  dayOfWeek    dayOfWeek
+  dayOfWeek    DayOfWeek
   openTime     String // Format: "HH:MM" (24-hour)
   closeTime    String // Fomrat: "HH:MM" (24-hour)
   isOpen       Boolean        @default(true)
@@ -97,7 +97,7 @@ model WorkingHour {
   @@index([isOpen])
 }
 
-enum dayOfWeek {
+enum DayOfWeek {
   MONDAY
   TUESDAY
   WEDNESDAY

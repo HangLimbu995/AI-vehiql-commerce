@@ -106,7 +106,7 @@ export async function saveWorkingHours(workingHours) {
       throw new Error("Unauthorized: Admin access required");
     }
 
-    const dealership = db.dealershipInfo.findFirst();
+    const dealership = await db.dealershipInfo.findFirst();
 
     if (!dealership) throw new Error("Dealership data not found");
 
@@ -122,7 +122,7 @@ export async function saveWorkingHours(workingHours) {
         data: {
           dayOfWeek: hour.dayOfWeek,
           openTime: hour.openTime,
-          closeTime: hour.openTime,
+          closeTime: hour.closeTime,
           isOpen: hour.isOpen,
           dealershipId: dealership.id,
         },
@@ -161,7 +161,6 @@ export async function getUsers() {
       orderBy: { createdAt: "desc" },
     });
 
-    console.log('user is ',users)
     
     return {
       success: true,
