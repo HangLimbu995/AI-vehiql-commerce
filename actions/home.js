@@ -26,7 +26,7 @@ export async function getFeaturedCars(limit = 3) {
       orderBy: { createdAt: "desc" },
     });
 
-    return cars.map(serializecarData);
+    return cars.map(serializeCarData);
   } catch (error) {
     throw new Error("Error fetching featured cars: " + error.message);
   }
