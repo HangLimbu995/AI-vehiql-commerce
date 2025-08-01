@@ -7,7 +7,6 @@ import { Button } from "./ui/button";
 import { useDropzone } from "react-dropzone";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Fascinate } from "next/font/google";
 import useFetch from "@/hooks/use-fetch";
 import { processImageSearch } from "@/actions/home";
 
