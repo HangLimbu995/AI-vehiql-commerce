@@ -1,7 +1,6 @@
 "use server";
 
 import { db } from "@/lib/prisma";
-import { tree } from "next/dist/build/templates/app-page";
 
 // Get simplified filters for the car marketplace
 export async function getCarFilters() {
@@ -46,7 +45,7 @@ export async function getCarFilters() {
     const priceAggregations = await db.car.aggregate({
       where,
       _min: { price: true },
-      _max: { price },
+      _max: { price: true },
     });
 
     return {
