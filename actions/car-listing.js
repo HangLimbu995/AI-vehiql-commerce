@@ -69,3 +69,95 @@ export async function getCarFilters() {
     throw new Error("Error fetching car filters:" + error.message);
   }
 }
+
+export async function getCars({
+  search = "",
+  make = "",
+  bodyType = "",
+  fuelType = "",
+  transmission = "",
+  minPrice = "",
+  maxPrice = Number.MAX_SAFE_INTEGER,
+  sortBy = "newest", // Options: newest, priceAsc, priceDesc
+  page = 1,
+  limit = 6,
+}) {
+  try {
+    // Get current user if authenticated
+    const { userId } = await auth();
+    let dbUser = null;
+
+    if (userId) {
+      dbUser = await db.user.findUnique({
+        where: { clerkUserId: userId },
+      });
+    }
+
+    // Build where conditions
+    let where = {
+      statu: "AVAILABLE",
+    };
+
+    if (search) {
+      where.OR = [
+        { make: { contains: search, mode: "insensitive" } },
+        { model: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    if (make) where.make = { equals: make, mode: "insensitive" };
+    if (bodyType) where.bodyType = { equals: bodyType, mode: "insensitive" };
+    if (fuelType) where.fuelType = { equals: fuelType, mode: "insensitive" };
+    if (transmission)
+      where.transmission = { equals: transmission, mode: "insensitive" };
+
+    // Add price range
+    where.price = {
+      gte: parseFloat(minPrice) || 0,
+    };
+
+    if (maxPrice < Number.MAX_SAFE_INTEGER) {
+      where.price.lte = parseFloat(maxPrice);
+    }
+
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+
+    // Determine sort order
+    let orderBy = {};
+    switch (orderBy) {
+      case "priceAsc":
+        orderBy = { price: "asc" };
+        break;
+      case "priceDesc":
+        orderBy = { price: "desc" };
+        break;
+      case "newest":
+        orderBy = { createdAt: "desc" };
+        break;
+    }
+
+    // Get total count for pagination
+    const totalCars = await db.car.count({ where });
+
+    // Execute the main query
+    const cars = await db.car.findMany({
+      where,
+      take: limit,
+      skip,
+      orderBy,
+    });
+
+    // If we have a user, check which cars are wishlisted
+    let wishlisted = new Set();
+    if (dbUser) {
+      const savedCars = await db.userSavedCar.findMany({
+        where: { userId: dbUser.id },
+        select: { carId: true },
+      });
+
+      wishlisted = new Set(savedCars.map((saved) => saved.carId));
+    }
+  } catch (error) {}
+}

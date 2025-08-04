@@ -1,6 +1,7 @@
 import { getCarFilters } from '@/actions/car-listing'
 import React from 'react'
 import CarFilters from './_components/car-filter'
+import CarListings from './_components/car-listing'
 
 export const metadata = {
     title: "Cars || Vehiql",
@@ -20,8 +21,8 @@ const CarsPage = async() => {
       <CarFilters filters={filtersData.data} />
             </div>
             <div className='flex-1'>
-                {/* Listing */}
                 {/* <CarListings /> */}
+                <CarListings />
             </div>
         </div>
     </div>
