@@ -51,7 +51,7 @@ export async function getCarFilters() {
     return {
       success: true,
       data: {
-        make: makes.map((item) => item.make),
+        makes: makes.map((item) => item.make),
         bodyTypes: bodyTypes.map((item) => item.bodyType),
         fuelTypes: fuelTypes.map((item) => item.fuelType),
         transmissions: transmissions.map((item) => item.transmission),
