@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import useFetch from "@/hooks/use-fetch";
 import { Info } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 const CarListings = () => {
@@ -56,20 +57,24 @@ const CarListings = () => {
   ]);
 
   useEffect(() => {
+    // Only push when the desired page differs from the current URL param
+    if (currentPage === page) return;
     const params = new URLSearchParams(searchParams);
     params.set("page", currentPage.toString());
-    router.push(`?page=${currentPage}`);
+    // Preserve existing query params (filters, search, sort) while changing page
+    router.push(`?${params.toString()}`);
   }, [currentPage, page, searchParams, router]);
 
   if (error || !result || !result?.success) {
-    <Alert variant="destructive">
-      <Info className="h-4 w-4" />
-
-      <AlertTitle>Error</AlertTitle>
-      <AlertDescription>
-        Failed to load cars. Please try again later.
-      </AlertDescription>
-    </Alert>;
+    return (
+      <Alert variant="destructive">
+        <Info className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>
+          Failed to load cars. Please try again later.
+        </AlertDescription>
+      </Alert>
+    );
   }
 
   if (!result || !result.data) {
