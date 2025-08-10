@@ -16,6 +16,8 @@ import Link from "next/link";
 
 export default async function Home() {
   const featuredCars = await getFeaturedCars();
+
+
   return (
     <div className="pt-20 flex flex-col">
       {/* Hero */}

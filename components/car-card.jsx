@@ -13,7 +13,7 @@ import { toggleSavedCar } from "@/actions/car-listing";
 import { toast } from "sonner";
 
 const CarCard = ({ car }) => {
-  const [isSaved, setIsSaved] = useState(car.wishlisted);
+  const [isSaved, setIsSaved] = useState(car.featured);
 
   const router = useRouter();
 
@@ -41,7 +41,7 @@ const CarCard = ({ car }) => {
 
   const handleToggleSave = async (e) => {
     e.preventDefault();
-    e.stopPropagation()
+    e.stopPropagation();
 
     if (!isSignedIn) {
       toast.error("Please sign in to save cars");
@@ -78,7 +78,7 @@ const CarCard = ({ car }) => {
             {isToggling ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Heart className={isSaved ? "fill-current" : ""} size={20} />
+              <Heart className={isSaved ? "fill-red-500 " : ""} size={20} />
             )}
           </Button>
         </div>

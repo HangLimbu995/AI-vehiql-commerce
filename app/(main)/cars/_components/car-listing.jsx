@@ -10,6 +10,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Pagiantion from "@/components/pagiantion";
+import CarListingsLoading from "./car-listing-loading";
 
 const CarListings = () => {
   const searchParams = useSearchParams();
@@ -72,6 +73,10 @@ const CarListings = () => {
     router.push(queryString ? `?${queryString}` : pathname);
   }, [currentPage, page, searchParams, router]);
 
+  if (loading && !result) {
+    return <CarListingsLoading />;
+  }
+
   if (error || !result || !result?.success) {
     return (
       <Alert variant="destructive">
@@ -87,13 +92,11 @@ const CarListings = () => {
   if (!result || !result.data) {
     return null;
   }
-let cars, pagination;
+  let cars, pagination;
   if (result?.success) {
-     cars = result?.success ? result.data : [];
-     pagination = result?.success ? result.pagination : [];
+    cars = result?.success ? result.data : [];
+    pagination = result?.success ? result.pagination : [];
   }
-
-  console.log('cars is ', cars)
 
   if (cars.length === 0) {
     return (
