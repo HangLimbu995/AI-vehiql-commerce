@@ -6,13 +6,15 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import useFetch from "@/hooks/use-fetch";
 import { Info } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import Pagiantion from "@/components/pagiantion";
 
 const CarListings = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname();
 
   const limit = 6;
 
@@ -60,9 +62,14 @@ const CarListings = () => {
     // Only push when the desired page differs from the current URL param
     if (currentPage === page) return;
     const params = new URLSearchParams(searchParams);
-    params.set("page", currentPage.toString());
+    if (currentPage === 1) {
+      params.delete("page");
+    } else {
+      params.set("page", currentPage.toString());
+    }
     // Preserve existing query params (filters, search, sort) while changing page
-    router.push(`?${params.toString()}`);
+    const queryString = params.toString();
+    router.push(queryString ? `?${queryString}` : pathname);
   }, [currentPage, page, searchParams, router]);
 
   if (error || !result || !result?.success) {
@@ -125,6 +132,13 @@ let cars, pagination;
           <CarCard key={car.id} car={car} />
         ))}
       </div>
+
+      {/* Pagination */}
+      <Pagiantion
+        currentPage={page}
+        totalPages={pagination.pages}
+        onPageChange={(newPage) => setCurrentPage(newPage)}
+      />
     </div>
   );
 };
