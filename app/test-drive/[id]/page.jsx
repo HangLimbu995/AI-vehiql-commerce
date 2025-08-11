@@ -1,8 +1,9 @@
 import { getCarById } from "@/actions/car-listing";
 import { notFound } from "next/navigation";
 import React from "react";
+import TestDriveForm from "./_components/test-drive-form";
 
-export async function generateMetaData() {
+export async function generateMetadata() {
   return {
     title: `Book Test Drive | Vehiql`,
     description: `Schedule a test drive in few seconds`,
@@ -10,7 +11,7 @@ export async function generateMetaData() {
 }
 
 const TestDrivePage = async ({ params }) => {
-  const { id } = await params;
+  const { id } = params;
   const result = await getCarById(id);
 
   if (!result.success) {

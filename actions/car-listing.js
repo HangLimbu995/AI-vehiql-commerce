@@ -157,7 +157,7 @@ export async function getCars({
     // If we have a user, check which cars are wishlisted
     let wishlisted = new Set();
     if (dbUser) {
-      const savedCars = await db.userSavedCar.findMany({
+    const savedCars = await db.userSavedCar.findMany({
         where: { userId: dbUser.id },
         select: { carId: true },
       });
@@ -285,7 +285,7 @@ export async function getSavedCars() {
     });
 
     // Serialize car data
-    const cars = saved.map((saved) => serializecarData(saved.car));
+    const cars = savedCars.map((saved) => serializecarData(saved.car));
 
     return {
       success: true,
@@ -336,16 +336,18 @@ export async function getCarById(carId) {
       isWishListed = !!savedCar;
     }
 
-    const existingTestDrive = await db.testDriveBooking.findFirst({
-      where: {
-        carId,
-        userId: dbUser.id,
-        status: { in: ["PENDING", "CONFIRMED", "COMPLETED"] },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    const existingTestDrive = dbUser
+      ? await db.testDriveBooking.findFirst({
+          where: {
+            carId,
+            userId: dbUser.id,
+            status: { in: ["PENDING", "CONFIRMED", "COMPLETED"] },
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        })
+      : null;
 
     let userTestDrive = null;
 
@@ -353,7 +355,7 @@ export async function getCarById(carId) {
       userTestDrive = {
         id: existingTestDrive.id,
         status: existingTestDrive.status,
-        bookingData: existingTestDrive.bookingData.toISOString(),
+        bookingDate: existingTestDrive.bookingDate.toISOString(),
       };
     }
 
