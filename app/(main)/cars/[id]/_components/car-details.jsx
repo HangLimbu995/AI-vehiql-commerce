@@ -31,6 +31,7 @@ import React, { useEffect, useState } from "react";
 import EMICalculator from "./emi-calculator";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { format } from "date-fns";
 
 const CarDetails = ({ car, testDriveInfo }) => {
   const router = useRouter();
