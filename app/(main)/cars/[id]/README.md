@@ -1,116 +1,204 @@
-### Build a mental model (beginner friendly)
+## Car Details Page — Complete Developer Guide
 
-Think of this page as three simple layers working together:
+This folder implements the product detail experience for a single car: data fetch, detail view, wishlisting, sharing, “Book Test Drive” entry point, and an interactive EMI calculator. It is designed to be readable, extensible, and production-ready.
 
-1) Data layer (server): fetch one car from the database.
-2) Page shell (server): put that car into the page layout.
-3) UI widgets (client): show details and run the EMI math in the browser.
+If you read only this file, you should be able to rebuild the entire feature from scratch with the same behavior and UX quality.
+
+### File map
 
 ```
 app/(main)/cars/[id]/
-  ├─ page.jsx                 ← server: fetch one car and render
+  ├─ page.jsx                 Server component: fetches data, sets SEO, renders page
   └─ _components/
-      ├─ car-details.jsx      ← client: gallery/specs and actions
-      └─ emi-calculator.jsx   ← client: sliders + EMI math
+      ├─ car-details.jsx      Client component: gallery, specs, wishlist/share, test-drive CTA
+      └─ emi-calculator.jsx   Client component: interactive loan math + sliders
 ```
 
-### How the data flows
+### Responsibilities (at a glance)
 
-- `page.jsx` calls `getCarById(id)` (server action) and passes the result to `CarDetails`.
-- `car-details.jsx` shows the car info and opens a dialog with `EMICalculator`.
-- `emi-calculator.jsx` receives `price`, `image`, `title` as props and calculates the payment numbers live.
+- page.jsx: server-only. Loads the car via `getCarById`, sets metadata, and renders `CarDetails`.
+- car-details.jsx: client-only. Renders images, price/specs, wishlist/share actions, EMI dialog, dealer info, and the “Book Test Drive” button.
+- emi-calculator.jsx: client-only. Provides an interactive loan estimate with safe clamping and live calculations.
 
-### Where the data comes from (API/database)
+## Data model and contracts
 
-- `actions/car-listing.js` (server): uses Prisma to query the PostgreSQL database.
-  - `getCarById(id)` → `db.car.findUnique({ where: { id } })` and some related info.
-  - Result is cleaned with `serializecarData()` (`lib/helper.js`) so numbers/dates are easy to use in React.
-- Prisma client is configured in `lib/prisma.js`. Tables and fields are defined in `prisma/schema.prisma` (see models: `Car`, `User`, `UserSavedCar`, etc.).
+### Source of truth
+- Data is fetched by `actions/car-listing.js#getCarById(id)` using Prisma.
+- Prisma models live in `prisma/schema.prisma` (notably the `Car` model). The action also includes derived info like `testDriveInfo`.
 
-### The most important functions (in plain English)
+### What `getCarById` returns (shape simplified)
 
-- `serializecarData(car, wishlisted)`
-  - Turns database types into simple JS types and adds a boolean flag `wishlisted`.
-
-- `formatCurrency(amount)`
-  - Displays numbers like `$12,345.67`. Change the currency or locale here.
-
-- `calculateMonthlyPayment(principal, annualInterestRate, totalMonths, downPayment)` (used in `car-details.jsx` for a quick preview)
-  - Calculates a monthly payment. If interest is zero, it’s just `principal / months`.
-
-- `EMICalculator` math (in `emi-calculator.jsx`)
-  - Financed amount: `P = max(price - downPayment, 0)`
-  - Monthly rate: `r = (APR / 100) / 12`
-  - Months: `n`
-  - EMI: if `r > 0`, `EMI = P * r * (1+r)^n / ((1+r)^n - 1)`; otherwise `EMI = P / n`
-  - Total Payment: `EMI * n`
-
-### What each slider/input controls
-
-- Down Payment: money paid upfront; increases → loan goes down.
-- Loan Amount: derived as `price - downPayment` (kept in sync with Down Payment).
-- Interest Rate (APR): percent per year; higher APR → higher EMI.
-- Loan Tenure (Months): how long you pay; more months → smaller EMI but more total interest.
-
-### Minimal “build your own” guide
-
-1) Server action (fetch one car)
-
-```js
-// actions/get-car.js
-"use server";
-import { db } from "@/lib/prisma";
-export async function getCarById(id) {
-  const car = await db.car.findUnique({ where: { id } });
-  return car; // serialize like this repo does for numbers/dates
-}
+```ts
+type Car = {
+  id: string;
+  make: string;
+  model: string;
+  year: number;
+  price: number;            // serialized to JS number
+  mileage: number;
+  fuelType: string;
+  transmission: string;
+  bodyType: string;
+  seats?: number | null;
+  description: string;
+  color: string;
+  images: string[];         // public URLs
+  status: "AVAILABLE" | "UNAVAILABLE" | "SOLD";
+  wishlisted: boolean;      // user-specific
+  testDriveInfo: {
+    userTestDrive: {
+      id: string;
+      status: "PENDING" | "CONFIRMED" | "COMPLETED";
+      bookingDate: string;  // ISO
+    } | null;
+    dealership: {
+      name: string;
+      address: string;
+      phone: string;
+      email: string;
+      workingHours: Array<{
+        dayOfWeek: "MONDAY"|"TUESDAY"|"WEDNESDAY"|"THURSDAY"|"FRIDAY"|"SATURDAY"|"SUNDAY";
+        openTime: string;   // "HH:MM"
+        closeTime: string;  // "HH:MM"
+        isOpen: boolean;
+      }>;
+    } | null;
+  };
+};
 ```
 
-2) Route file (server)
+### Props contracts used here
+- `page.jsx` passes `result.data` (the `Car`) and its nested `testDriveInfo` directly to `CarDetails`.
+- `CarDetails` passes three props to the EMI dialog: `price`, `image`, `title`.
 
-```jsx
-// app/cars/[id]/page.jsx
-import { getCarById } from "@/actions/get-car";
-import CarDetails from "./_components/car-details";
-export default async function Page({ params }) {
-  const car = await getCarById(params.id);
-  return <CarDetails car={car} />;
-}
-```
+## End-to-end control flow
 
-3) Client details component
+1) Request comes to route `app/(main)/cars/[id]/page.jsx`.
+2) Server fetch: `getCarById(id)` loads the specific car and associated info.
+3) `generateMetadata` sets contextual SEO (title/description/OG image) based on loaded car data.
+4) The page renders `<CarDetails car={result.data} testDriveInfo={result.data.testDriveInfo} />`.
+5) In the browser, `CarDetails` manages UI interactions: gallery, wishlist toggle, sharing, and the “Book Test Drive” navigation to `/test-drive/[id]`.
+6) Opening the EMI dialog renders `EMICalculator` with live calculations.
 
-```jsx
-// app/cars/[id]/_components/car-details.jsx
-"use client";
-import EMICalculator from "./emi-calculator";
-export default function CarDetails({ car }) {
-  return <EMICalculator price={car.price} image={car.images?.[0]} title={`${car.year} ${car.make} ${car.model}`} />;
-}
-```
+## UI anatomy and behaviors
 
-4) EMI calculator core (client)
+### Gallery
+- Uses `next/image` for the primary image and a strip of thumbnails.
+- Clicking a thumbnail updates `currentImageIndex`.
+- Fallback: when no images, shows a car icon inside a neutral placeholder.
 
-```jsx
-// app/cars/[id]/_components/emi-calculator.jsx
-"use client";
-// keep state: downPayment, apr, months
-// compute financed = price - downPayment, then EMI using the formula above
-```
+### Price and specs
+- Price uses `formatCurrency` for locale-aware display.
+- Key specs: mileage, fuel type, transmission; plus description, features, and detailed specs grid.
 
-That’s the whole flow: server fetch → pass props → render UI → compute EMI in the browser.
+### Wishlist (favorites)
+- Requires sign-in (checked via Clerk’s `useAuth`). If not signed in, routes to `/sign-in`.
+- Invokes `actions/car-listing.js#toggleSavedCar(car.id)` via a small `useFetch` helper.
+- On success, toggles local UI state and shows a toast.
 
-### Style and libraries used here
+### Share
+- Uses the Web Share API when available; falls back to copying the current URL to clipboard with a success toast.
 
-- Next.js App Router (server + client components).
-- Prisma + PostgreSQL for data; Clerk auth is used for wishlist toggling.
-- shadcn/ui components and TailwindCSS for styling.
-- `next/image` for optimized images.
+### Book Test Drive
+- Disabled when the car is `SOLD`/`UNAVAILABLE` or when the user already has a `userTestDrive` for this car.
+- Navigates to `/test-drive/{car.id}`; that route handles date/time selection and booking persistence.
 
-### Tips for beginners
+### Dealer info
+- Displays name, address, contact info and normalized weekly working hours.
+- If the dealership record is absent, the UI shows sensible defaults.
 
-- Keep server logic (database queries) in server actions; pass plain props to client components.
-- Start with one value and one slider. Once it works, add the others.
-- Use small helper functions (`clamp`, `formatCurrency`) to keep UI code clean.
-- Test the EMI math in isolation with a few known values (e.g., 0% APR, 12 months) to build confidence.
+## EMI calculator (loan math)
+
+Inputs and state:
+- Price (pre-filled from car), Down payment, APR, Months.
+
+Derived values and formulas:
+- Financed amount: `P = max(price - downPayment, 0)`
+- Monthly rate: `r = (APR / 100) / 12`
+- Months: `n`
+- EMI:
+  - If `r > 0`: `EMI = P * r * (1 + r)^n / ((1 + r)^n - 1)`
+  - Else: `EMI = P / n`
+- Total Payment: `EMI * n`
+- Total Interest: `max(Total Payment - P, 0)`
+
+Engineering details:
+- Inputs are clamped with a small helper to keep values in safe ranges (e.g., down payment never above price, months within [6, 96], APR within [0, 25]).
+- Sliders and inputs stay in sync; changing “Loan Amount” slider recalculates down payment accordingly.
+
+Tuning points:
+- Change default APR/months in `emi-calculator.jsx` (state initialization).
+- Adjust slider ranges/steps to match local financing norms.
+
+## Error states and resilience
+
+- Server-side: if `getCarById` fails, `page.jsx` calls `notFound()` to render the global 404.
+- Client-side fallbacks:
+  - No images → icon placeholder.
+  - Car status `SOLD`/`UNAVAILABLE` → destructive `Alert` with disabled booking.
+  - Not signed in → toast + push to `/sign-in` for actions (wishlist, booking).
+  - Dealership absent → defaults in the working-hours list.
+
+## SEO and accessibility
+
+- `generateMetadata` sets page title, description, and Open Graph image when available.
+- Primary image includes an `alt` that concatenates `year`, `make`, `model`.
+- Interactive elements include clear labels and icons from `lucide-react`.
+
+## Libraries and utilities used
+
+- Next.js App Router: server and client components together.
+- Prisma + PostgreSQL via server actions under `actions/`.
+- Clerk for authentication (`useAuth`) to gate wishlist/booking.
+- shadcn/ui for consistent UI primitives (Button, Dialog, Card, Badge, Alert, Slider, etc.).
+- `next/image` for responsive, optimized images.
+- `date-fns` for formatting dates in the “Booked” state.
+- `sonner` toasts for quick feedback.
+
+## Rebuild this from scratch (step-by-step)
+
+1) Create the route folder `app/(main)/cars/[id]/` with `page.jsx`.
+2) Implement a server action `getCarById(id)` that returns the `Car` shape above (serialize Prisma results to plain JS types where needed).
+3) In `page.jsx`:
+   - `await getCarById(params.id)`
+   - If unsuccessful, `notFound()`.
+   - `generateMetadata` using the loaded car data.
+   - Render `<CarDetails car={car} testDriveInfo={car.testDriveInfo} />`.
+4) Create `_components/car-details.jsx` as a client component:
+   - Local state: wishlist flag, current image index.
+   - Render gallery with thumbnails and fallbacks.
+   - Show price, specs, description, features, and a specs grid.
+   - Use a `Dialog` to host `<EMICalculator price={car.price} image={car.images?.[0]} title={`${car.year} ${car.make} ${car.model}`} />`.
+   - Buttons: Save (toggles via server action), Share (Web Share → clipboard fallback), Book Test Drive (push to `/test-drive/${car.id}`).
+   - Dealer section with working hours list.
+5) Create `_components/emi-calculator.jsx` as a client component:
+   - State: `price`, `downPayment`, `apr`, `months`.
+   - Sliders + numeric inputs with clamping.
+   - Compute EMI using the formula above and show summary (EMI, Total Payment, optional Total Interest).
+6) Wire styles with shadcn/ui + Tailwind.
+7) Ensure Clerk is configured so wishlist/booking flows can check `isSignedIn`.
+
+## Extending safely
+
+- Add financing presets (36/48/60/72 months) as quick buttons.
+- Persist a user’s last used APR/tenure in localStorage for convenience.
+- Track analytics when users open EMI dialog or click “Apply”.
+- Add a comparison table for multiple down-payment scenarios.
+- Defer-load the EMI dialog (dynamic import) if performance becomes a concern.
+
+## FAQ and common pitfalls
+
+- Why are prices and dates “already JS-friendly”? The server action uses a serializer (`serializecarData`) to convert Prisma types to plain JS numbers/strings.
+- Why is booking disabled sometimes? The car can be `SOLD`/`UNAVAILABLE`, or the user already has an active/completed booking.
+- Web Share API fails in some browsers — we automatically fall back to copying the URL.
+- Working hours may be absent — UI shows reasonable defaults.
+
+## Quality checklist
+
+- Server errors yield a proper 404 via `notFound()`.
+- Images have descriptive `alt` text and responsive sizing.
+- Buttons are keyboard-accessible; toasts confirm actions.
+- All volatile inputs in the EMI calculator are validated/clamped.
+
+With this guide, you can confidently re-create or extend the car detail experience, understanding each moving part and the contracts that tie them together.
 
