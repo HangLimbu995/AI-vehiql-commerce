@@ -13,7 +13,7 @@ import { toggleSavedCar } from "@/actions/car-listing";
 import { toast } from "sonner";
 
 const CarCard = ({ car }) => {
-  const [isSaved, setIsSaved] = useState(car.featured);
+  const [isSaved, setIsSaved] = useState(car.wishlisted);
 
   const router = useRouter();
 
