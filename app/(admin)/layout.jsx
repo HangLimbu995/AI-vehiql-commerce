@@ -1,6 +1,6 @@
 import Header from "@/components/header";
 import React from "react";
-import Sidebar from "./_components/sidebar";
+import Sidebar from "./admin/_components/sidebar";
 import { getAdmin } from "@/actions/admin";
 import { notFound } from "next/navigation";
 
