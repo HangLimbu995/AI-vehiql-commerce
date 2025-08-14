@@ -209,5 +209,78 @@ export async function getDashBoardData() {
         },
       }),
     ]);
-  } catch (error) {}
+
+    // Calculate car statistics
+    const totalCars = cars.length;
+    const availableCars = cars.filter(
+      (car) => car.status === "AVAILABLE"
+    ).length;
+    const soldCars = cars.filter((car) => car.status === "SOLD").length;
+    const unavailableCars = cars.filter(
+      (car) => car.status === "UNAVAILABLE"
+    ).length;
+    const featuredCars = cars.filter((car) => car.featured === true).true;
+
+    // Calculate test drive statistics
+    const totalTestDrives = testDrives.length;
+    const pendingTestDrives = testDrives.filter(
+      (td) => td.status === "PENDING"
+    ).length;
+    const confirmedTestDrives = testDrives.filter(
+      (td) => td.status === "CONFIRMED"
+    ).length;
+    const completedTestDrives = testDrives.filter(
+      (td) => td.status === "COMPLETED"
+    ).length;
+    const cancelledTestDrives = testDrives.filter(
+      (td) => td.status === "CANCELLED"
+    ).length;
+    const noShowTestDrives = testDrives.filter(
+      (td) => td.status === "NO_SHOW"
+    ).length;
+
+    // Calculate test drive conversion rate
+    const completedTestDriveCarIds = testDrives
+      .filter((td) => td.status === "COMPELTED")
+      .map((td) => td.cariD);
+
+    const soldCarsAfterTestDrive = cars.filter(
+      (car) =>
+        car.status === "SOLD" && completedTestDriveCarIds.includes(car.id)
+    );
+
+    // Completed test drives to Sold cars after test drives conversion Rate
+    const conversionRate =
+      completedTestDrives > 0
+        ? (soldCarsAfterTestDrive / completedTestDrives) * 100
+        : 0;
+
+    return {
+      success: true,
+      data: {
+        cars: {
+          total: totalCars,
+          available: availableCars,
+          sold: soldCars,
+          unavailable: unavailableCars,
+          featured: featuredCars,
+        },
+        testDrvies: {
+          total: totalTestDrives,
+          pending: pendingTestDrives,
+          completed: completedTestDrives,
+          confirmed: confirmedTestDrives,
+          cancelled: cancelledTestDrives,
+          noShow: noShowTestDrives,
+          conversionRate: parseFloat(conversionRate.toFixed(2)),
+        },
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching dashboard data:", error.message);
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
 }
