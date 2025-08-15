@@ -2,6 +2,7 @@
 
 import { getAdminTestDrives, updateTestDriveStatus } from "@/actions/admin";
 import { cancelTestDrive } from "@/actions/test-drive";
+import TestDriveCard from "@/components/test-drive-card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -89,6 +90,11 @@ const TestDrivesList = () => {
     }
   };
 
+  // Handle booking cancellation
+  const handleCancel = async (bookingId) => {
+    await cancelTestDriveFn(bookingId);
+  };
+
   return (
     <div className="space-y-4">
       {/* Filters and Search */}
@@ -174,7 +180,37 @@ const TestDrivesList = () => {
           ) : (
             <div className="space-y-4">
               {testDrivesData?.data?.map((booking) => (
-                <div className="relative" key={booking.id}></div>
+                <div className="relative" key={booking.id}>
+                  <TestDriveCard
+                    booking={booking}
+                    onCancel={handleCancel}
+                    showActions={["PENDING", "CONFIRMED"].includes(
+                      booking.status
+                    )}
+                    isAdmin={true}
+                    isCancelling={cancelError}
+                    renderStatusSelector={() => (
+                      <Select
+                        value={booking.status}
+                        onValueChange={(value) =>
+                          handleUpdateStatus(booking.id, value)
+                        }
+                        disabled={updatingStatus}
+                      >
+                        <SelectTrigger className="w-full h-8">
+                          <SelectValue placeholder="Update Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="PENDING">Pending</SelectItem>
+                          <SelectItem value="CONFIRMED">Confirmed</SelectItem>
+                          <SelectItem value="COMPLETED">Completed</SelectItem>
+                          <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                          <SelectItem value="NO_SHOW">No Show</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
               ))}
             </div>
           )}
