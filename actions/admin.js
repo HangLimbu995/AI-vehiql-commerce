@@ -265,7 +265,7 @@ export async function getDashBoardData() {
           unavailable: unavailableCars,
           featured: featuredCars,
         },
-        testDrvies: {
+        testDrives: {
           total: totalTestDrives,
           pending: pendingTestDrives,
           completed: completedTestDrives,
